@@ -1,0 +1,20 @@
+# Do not leave on true in production
+debug = true
+
+[default]
+# Same road that nginx config. See location's key
+routeInitial = "/api/v1"
+secretKey = "My_secret_key"
+# Alg support HS256, HS384 and HS512
+alg = "HS256"
+# Time in seconds before jwt is invalidate
+exp = 120
+sub = "my_domain.com"
+# Timeout to contact others API
+timeout = 5
+whereList = ["Salon"]
+
+[Salon]
+ip = "http://192.168.1.18"
+port = 8090
+api = "/api/v1"
