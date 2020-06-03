@@ -4,24 +4,13 @@ local json = require( "json" )
 http.TIMEOUT = 5
 
 local function buildURL( location, action )
-  local url = {}
-
-  url[1] = location.ip
-
-  if location.port then
-    table.insert( url, ":" .. location.port )
-  end
-  if location.api then
-    if not location.api:match( "^/" ) then table.insert( url, "/" ) end
-
-    table.insert(url, location.api)
-
-    if not location.api:match( "/$" ) then table.insert( url, "/" ) end
-  end
-
-  table.insert( url, action )
-
-  return table.concat( url, "" )
+  return
+    location.ip ..
+    (location.port and (":" .. location.port) or "") ..
+    (location.api and (location.api:sub(1,1)~="/") and "/") or "") ..
+    (location.api or "") ..
+    (location.api and (location.api:sub(-1,-1)~="/") and "/") or "") ..
+    action
 end
 
 local function checkProblems( queryParameters, debug, data )
