@@ -7,9 +7,9 @@ local function buildURL( location, action )
   local url = {
     location.ip,
     (location.port and (":" .. location.port) or ""),
-    (location.api and (not location.api:sub(1,1)=="/") and "/") or ""),
+    (location.api and (location.api:sub(1,1)~="/") and "/") or ""),
     location.api or "",
-    (location.api and (not location.api:sub(-1,-1)=="/") and "/") or ""),
+    (location.api and (location.api:sub(-1,-1)~="/") and "/") or ""),
     action,
   }
   return table.concat( url, "" )
