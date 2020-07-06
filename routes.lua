@@ -6,10 +6,10 @@ http.TIMEOUT = 5
 local function buildURL( location, action )
   return
     location.ip ..
-    (location.port and (":" .. location.port) or "") ..
-    (location.api and (location.api:sub(1,1)~="/") and "/") or "") ..
-    (location.api or "") ..
-    (location.api and (location.api:sub(-1,-1)~="/") and "/") or "") ..
+    ( location.port and ( ":" .. location.port ) or "") ..
+    ( location.api and (( location.api:sub( 1, 1 ) ~= "/" ) and "/" ) or "" ) ..
+    ( location.api or "" ) ..
+    ( location.api and (( location.api:sub( -1, -1 ) ~= "/" ) and "/" ) or "" ) ..
     action
 end
 
