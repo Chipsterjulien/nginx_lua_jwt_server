@@ -67,6 +67,15 @@ local function startStop( queryParameters, debug, data, action )
     ngx.exit( 500 )
   end
 
+  if action == "startAlarm" then
+    local startFile = data.default.startFile
+    local fd = os.open(startFile, 'w')
+    fd:close()
+  elseif action == "stopAlarm" then
+    local startFile = data.default.startFile
+    os.remove(startFile)
+  end
+
   ngx.say( dataStr )
   ngx.exit( 200 )
 end

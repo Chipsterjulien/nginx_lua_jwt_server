@@ -13,6 +13,8 @@ sub = "my_domain.com"
 # Timeout to contact others API
 timeout = 5
 whereList = ["Salon"]
+# File to indicate alarm is on
+startFile = ""
 
 [Salon]
 ip = "http://192.168.1.18"
