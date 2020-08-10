@@ -5,6 +5,7 @@ package.path = package.path .. ';/app/?.lua'
 local dbFile = '/app/db/dbFile.db'
 
 local external = require( 'external' )
+local ngx = ngx or require( 'ngx' )
 
 local function main()
   local data = external.readEntireFile( dbFile )
@@ -13,7 +14,7 @@ local function main()
   -- Load all login and password in shared memory
   for _, line in ipairs( dataSplitted ) do
     if line ~= '' then
-      local login, password = unpack( external.splitN( line, " " ) )
+      local login, password = unpack( external.splitN( line, ' ' ) )
 
       local db = ngx.shared.db
       local success, err = db:set( login, password )
