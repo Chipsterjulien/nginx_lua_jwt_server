@@ -28,9 +28,7 @@ function external.loadConfig( filename, parseToml )
   end
 
   -- Config file must endling by empty line
-  if not tomlStr:match( '\n$' ) then
-    tomlStr = tomlStr .. '\n'
-  end
+  tomlStr = tomlStr .. '\n'
 
   local data = parseToml( tomlStr )
 
