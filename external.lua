@@ -20,7 +20,7 @@ function external.isTableEmpty( data )
   return true
 end
 
-function external.loadConfig( filename, toml )
+function external.loadConfig( filename, parseToml )
   local tomlStr = external.readEntireFile( filename )
 
   if not tomlStr then
@@ -32,7 +32,7 @@ function external.loadConfig( filename, toml )
     tomlStr = tomlStr .. '\n'
   end
 
-  local data = toml.parse( tomlStr )
+  local data = parseToml( tomlStr )
 
   if external.isTableEmpty( data ) then
     return nil, filename .. ' is an empty config file'

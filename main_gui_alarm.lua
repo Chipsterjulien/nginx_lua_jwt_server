@@ -36,7 +36,7 @@ local getWebRoutes = {
 ------------
 
 local function main()
-  local data, err = external.loadConfig( confFile, toml )
+  local data, err = external.loadConfig( confFile, toml.parse )
 
   if err then
     external.errorResponse( 500, err )
