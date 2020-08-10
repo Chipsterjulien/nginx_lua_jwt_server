@@ -2,7 +2,7 @@
 
 -- https://blog.elao.com/fr/infra/acceder-api-cross-domain-depuis-javascript-avec-cors-reverse-proxy-nginx/
 
-package.path = package.path .. ';/app/?.lua'
+package.path = package.path .. ';/app/?.lua;/app/external/?.lua'
 
 local confFile = '/app/cfg/guiAlarm.toml'
 

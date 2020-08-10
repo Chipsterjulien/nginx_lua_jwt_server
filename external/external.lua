@@ -1,7 +1,7 @@
 local external = {}
 
-local ngx = ngx or require( 'ngx' )
 local json = require( 'json' )
+local ngx = ngx or require( 'ngx' )
 
 function external.errorResponse( codeINT, errorStr )
   ngx.status = codeINT

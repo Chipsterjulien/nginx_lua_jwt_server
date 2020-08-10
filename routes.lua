@@ -1,7 +1,7 @@
 local jwt = require( 'jwt' )
-local http = require( 'socket.http' )
 local json = require( 'json' )
 local external = require( 'external' )
+local http = require( 'socket.http' )
 
 http.TIMEOUT = 5
 
