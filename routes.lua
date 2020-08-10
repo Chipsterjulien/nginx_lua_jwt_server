@@ -1,7 +1,11 @@
-local jwt = require( "jwt" )
-local http = require( "socket.http" )
-local json = require( "json" )
+local jwt = require( 'jwt' )
+local http = require( 'socket.http' )
+local json = require( 'json' )
+local external = require( 'external' )
+
 http.TIMEOUT = 5
+
+local ngx = ngx or require( 'ngx' )
 
 local function buildURL( location, action )
   return
@@ -13,28 +17,27 @@ local function buildURL( location, action )
     action
 end
 
-local function checkProblems( queryParameters, debug, data )
+local function checkProblems( queryParameters, data )
   -- check if where parameters is empty, not existing
   if not queryParameters.where then
-    errorResponse( debug, 404, "No or not acceptable query parameters given" )
-    ngx.exit( 404 )
+    external.errorResponse( 404, 'No or not acceptable query parameters given' )
   end
 
   local where = queryParameters.where
   if where == "" then
-    errorResponse( debug, 400, "'where' query parameter is empty" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, "'where' query parameter is empty" )
   end
 
   if type( where ) ~= 'string' then
-    errorResponse( debug, 400, "'where' query parameter is not a string (found a " .. type( where ) .. ")" )
-    ngx.exit( 400 )
+    external.errorResponse(
+      400,
+      "'where' query parameter is not a string (found a " .. type( where ) .. ')'
+    )
   end
 
   -- Check if where exist in config file
   if not data[where] then
-    errorResponse( debug, 400, "[" .. where .. "]" .. " is not known in confilg file" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, '[' .. where .. ']' .. ' is not known in confilg file' )
   end
 end
 
@@ -47,14 +50,22 @@ local function getURL( url, timeout )
   local body, code, statusCode = http.request( url )
 
   if code ~= 200 then
-    return nil, "Unable to get '" .. url .. "': connection " .. statusCode.connection
+    if type( code ) == 'number' then
+      if not statusCode.connection then
+        return nil, "Unable to get '" .. url
+      else
+        return nil, "Unable to get '" .. url .. "': connection " .. statusCode.connection
+      end
+    elseif type( code ) == 'string' then
+      return nil, "Unable to get '" .. url .. "': " .. code
+    end
   end
 
-  return body:gsub( "\n", "" ), nil
+  return body:gsub( '\n', '' ), nil
 end
 
-local function startStop( queryParameters, debug, data, action )
-  checkProblems( queryParameters, debug, data )
+local function startStop( queryParameters, data, action )
+  checkProblems( queryParameters, data )
 
   -- buildURL
   local where = queryParameters.where
@@ -63,21 +74,19 @@ local function startStop( queryParameters, debug, data, action )
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
   if err then
-    errorResponse( debug, 500, err )
-    ngx.exit( 500 )
+    external.errorResponse( 500, err )
   end
 
-  if action == "startAlarm" then
+  if action == 'startAlarm' then
     local startFile = data.default.startFile
     local fd = os.open(startFile, 'w')
     fd:close()
-  elseif action == "stopAlarm" then
+  elseif action == 'stopAlarm' then
     local startFile = data.default.startFile
     os.remove(startFile)
   end
 
   ngx.say( dataStr )
-  ngx.exit( 200 )
 end
 
 ------
@@ -86,10 +95,9 @@ end
 
 local routes = {}
 
-function routes.getList( debug, data )
+function routes.getList( data )
   if not data.default.whereList then
-    errorResponse( debug, 404, "'whereList' not found in config file" )
-    ngx.exit( 404 )
+    external.errorResponse( 404, "'whereList' not found in config file" )
   end
 
   local payload = {
@@ -98,34 +106,30 @@ function routes.getList( debug, data )
   }
 
   ngx.say( json.encode( payload ) )
-  ngx.exit( 200 )
 end
 
-function routes.getState( debug, data )
+function routes.getState( data )
   local queryParameters = ngx.req.get_uri_args()
 
-  checkProblems( queryParameters, debug, data)
+  checkProblems( queryParameters, data)
 
   -- buildURL
   local where = queryParameters.where
-  local url = buildURL( data[ where ], "stateAlarm" )
+  local url = buildURL( data[ where ], 'stateAlarm' )
 
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
   if err then
-    errorResponse( debug, 500, err )
-    ngx.exit( 500 )
+    external.errorResponse( 500, err )
   end
 
   ngx.say( dataStr )
-  ngx.exit( 200 )
 end
 
-function routes.refresh( debug, data, myJWT )
+function routes.refresh( data, myJWT )
   local newJWT, exp, err = jwt.refresh( myJWT, data.default.secretKey, data.default.exp )
   if err then
-    errorResponse( debug, 400, err )
-    ngx.exit( 400 )
+    external.errorResponse( 400, err )
   end
 
   -- Build payload response
@@ -136,23 +140,22 @@ function routes.refresh( debug, data, myJWT )
   }
 
   ngx.say( json.encode( payload ) )
-  ngx.exit( 200 )
 end
 
-function routes.startAlarm( debug, data )
-  startStop( ngx.req.get_uri_args(), debug, data, "startAlarm" )
+function routes.startAlarm( data )
+  startStop( ngx.req.get_uri_args(), data, 'startAlarm' )
 end
 
-function routes.startStream( debug, data )
-  startStop( ngx.req.get_uri_args(), debug, data, "startStream" )
+function routes.startStream( data )
+  startStop( ngx.req.get_uri_args(), data, 'startStream' )
 end
 
-function routes.stopAlarm( debug, data )
-  startStop( ngx.req.get_uri_args(), debug, data, "stopAlarm" )
+function routes.stopAlarm( data )
+  startStop( ngx.req.get_uri_args(), data, 'stopAlarm' )
 end
 
-function routes.stopStream( debug, data )
-  startStop( ngx.req.get_uri_args(), debug, data, "stopStream" )
+function routes.stopStream( data )
+  startStop( ngx.req.get_uri_args(), data, 'stopStream' )
 end
 
 return routes

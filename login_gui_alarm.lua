@@ -2,46 +2,31 @@
 
 -- https://blog.elao.com/fr/infra/acceder-api-cross-domain-depuis-javascript-avec-cors-reverse-proxy-nginx/
 
-package.path = package.path .. ";/app/?.lua"
+package.path = package.path .. ';/app/?.lua'
 
-local confFile = "/app/cfg/guiAlarm.toml"
+local confFile = '/app/cfg/guiAlarm.toml'
 
-local json = require("json")
-local toml = require("toml")
-local jwt = require("jwt")
-local external = require("external")
+local json = require( 'json' )
+local toml = require( 'toml' )
+local jwt = require( 'jwt' )
+local external = require( 'external' )
 
-local function errorResponse( debug, codeINT, errorStr )
-  -- In debug mode, send the right error otherwise, to "counter" somes attacks, send a status code to 200
-  if not debug then
-    ngx.log(ngx.STDERR, errorStr)
-
-    ngx.status = 200
-    ngx.exit(200)
-  end
-
-  ngx.status = codeINT
-  ngx.say(json.encode({error = errorStr}))
-
-  ngx.log(ngx.STDERR, errorStr)
-end
+local ngx = ngx or require( 'ngx' )
 
 local function main()
   local data, err = external.loadConfig( confFile, toml )
-  local debug = false
-
-  if data and data.debug ~= nil then debug = data.debug end
 
   if err then
-    errorResponse( debug, 500, err )
-    ngx.exit( 500 )
+    external.errorResponse( 500, err )
   end
 
   -- Check if request method is POST
   local requestMethod = ngx.var.request_method
   if requestMethod ~= 'POST' then
-    errorResponse( debug, 405, requestMethod .. " method is not supported in " .. ngx.var.uri .. " call" )
-    ngx.exit( 405 )
+    external.errorResponse(
+      405,
+      requestMethod .. ' method is not supported in ' .. ngx.var.uri .. ' call'
+    )
   end
 
   -- Explicitly read the request body
@@ -49,31 +34,26 @@ local function main()
   -- Get data from request body
   local body = ngx.req.get_body_data()
   if not body or body == "" then
-    errorResponse( debug, 400, "No data found" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, 'No data found' )
   end
 
-  local bodyJSON = json.decode(body)
-  if external.isTableEmpty(bodyJSON) then
-    errorResponse( debug, 500, "Unable to decode string to JSON" )
-    ngx.exit( 500 )
+  local ok, bodyJSON = pcall( json.decode, body )
+  if not ok or external.isTableEmpty( bodyJSON ) then
+    external.errorResponse( 500, 'Unable to decode string to JSON' )
   end
 
   if not bodyJSON.username then
-    errorResponse( debug, 400, "Username are missing" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, 'Username are missing' )
   end
   if not bodyJSON.password then
-    errorResponse( debug, 400, "Password are missing" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, 'Password are missing' )
   end
 
   local db = ngx.shared.db
   local value = db:get( bodyJSON.username )
 
   if value ~= bodyJSON.password then
-    errorResponse( true, 400, "Bad username and/or password" )
-    ngx.exit( 400 )
+    external.errorResponse( 400, 'Bad username and/or password' )
   end
 
   -- Build payload to create signature
@@ -87,8 +67,7 @@ local function main()
   myJWT, exp, err = jwt.sign(payload, data.default.secretKey, data.default.alg)
 
   if err then
-    errorResponse( debug, 400, err )
-    ngx.exit( 400 )
+    external.errorResponse( 400, err )
   end
 
   -- Build payload response
@@ -99,6 +78,7 @@ local function main()
   }
 
   ngx.say( json.encode( payload ) )
+  ngx.exit( 200 )
 end
 
 ------
