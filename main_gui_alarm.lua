@@ -15,7 +15,6 @@
 package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party/?.lua'
 
 local jwt = require( 'jwt' )
-local toml = require( 'toml' )
 local routes = require( 'routes' )
 local loadConfig = require( 'external.loadConfig' )
 local errorResponse = require( 'external.errorResponse' )
@@ -38,7 +37,7 @@ local getWebRoutes = {
 ------------
 
 local function main()
-  local data, err = loadConfig( confFile, toml.parse )
+  local data, err = loadConfig( confFile )
 
   if err then
     errorResponse( 500, err )

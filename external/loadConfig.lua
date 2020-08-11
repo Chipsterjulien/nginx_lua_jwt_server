@@ -1,7 +1,8 @@
+local toml = require( 'toml' )
 local readEntireFile = require( 'readEntireFile' )
 local isTableEmpty = require( 'isTableEmpty' )
 
-local function loadConfig( filename, parseToml )
+local function loadConfig( filename )
   local tomlStr = readEntireFile( filename )
 
   if not tomlStr then
@@ -11,7 +12,7 @@ local function loadConfig( filename, parseToml )
   -- Config file must endling by empty line
   tomlStr = tomlStr .. '\n'
 
-  local data = parseToml( tomlStr )
+  local data = toml.parse( tomlStr )
 
   if isTableEmpty( data ) then
     return nil, filename .. ' is an empty config file'

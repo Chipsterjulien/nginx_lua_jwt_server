@@ -7,7 +7,6 @@ package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party
 local confFile = '/app/cfg/guiAlarm.toml'
 
 local json = require( 'json' )
-local toml = require( 'toml' )
 local jwt = require( 'jwt' )
 local loadConfig = require( 'external.loadConfig' )
 local isTableEmpty = require( 'external.isTableEmpty' )
@@ -15,7 +14,7 @@ local errorResponse = require( 'external.errorResponse' )
 local ngx = ngx or require( 'ngx' )
 
 local function main()
-  local data, err = loadConfig( confFile, toml.parse )
+  local data, err = loadConfig( confFile )
 
   if err then
     errorResponse( 500, err )
