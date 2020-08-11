@@ -17,11 +17,11 @@ package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party
 local jwt = require( 'jwt' )
 local toml = require( 'toml' )
 local routes = require( 'routes' )
-local external = require( 'external' )
+local loadConfig = require( 'external.loadConfig' )
+local errorResponse = require( 'external.errorResponse' )
+local ngx = ngx or require( 'ngx' )
 
 local confFile = '/app/cfg/guiAlarm.toml'
-
-local ngx = ngx or require( 'ngx' )
 
 local getWebRoutes = {
   ['/getList'] = function( data ) routes.getList( data ) end,
@@ -38,15 +38,15 @@ local getWebRoutes = {
 ------------
 
 local function main()
-  local data, err = external.loadConfig( confFile, toml.parse )
+  local data, err = loadConfig( confFile, toml.parse )
 
   if err then
-    external.errorResponse( 500, err )
+    errorResponse( 500, err )
   end
 
   local headers = ngx.req.get_headers()
   if not headers or not headers.authorization then
-    external.errorResponse( 401, "Header's authorization is missing" )
+    errorResponse( 401, "Header's authorization is missing" )
   end
 
   local myJWT = headers.authorization:gsub( 'Bearer ', '' )
@@ -54,14 +54,14 @@ local function main()
   local _
   _, _, err = jwt.verify( myJWT, data.default.secretKey, true )
   if err then
-    external.errorResponse( 401, err )
+    errorResponse( 401, err )
   end
 
   local routeInitial = data.default.routeInitial:gsub( "/$", '' )
   local road = ngx.var.uri:gsub( routeInitial, '' )
 
   if not getWebRoutes[ road ] then
-    external.errorResponse( 404, ngx.var.uri .. ' URL does not exist' )
+    errorResponse( 404, ngx.var.uri .. ' URL does not exist' )
   end
 
   getWebRoutes[ road ]( data, myJWT )

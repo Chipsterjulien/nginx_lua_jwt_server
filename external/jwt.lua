@@ -1,6 +1,7 @@
 local basexx = require( "basexx" )
 local sha2 = require( "sha2" )
 local json = require( "json" )
+local splitN = require( 'splitN' )
 
 local alg_sign = {
   ['HS256'] = function( data, key ) return sha2.hmac(sha2.sha256, key, data) end,
@@ -13,29 +14,6 @@ local alg_verify = {
   ['HS384'] = function( data, signature, key ) return signature == sha2.hex2bin(alg_sign['HS384'](data, key)) end,
   ['HS512'] = function( data, signature, key ) return signature == sha2.hex2bin(alg_sign['HS512'](data, key)) end
 }
-
-local function splitN( str, sep, maxSplit )
-  sep = sep or ' '
-  maxSplit = maxSplit or #str
-  local t = {}
-  local s = 1
-  local e, f = str:find(sep, s, true)
-
-  while e do
-    maxSplit = maxSplit - 1
-    if maxSplit <= 0 then break end
-
-    table.insert(t, str:sub(s, e - 1))
-    s = f + 1
-    e, f = str:find(sep, s, true)
-  end
-
-  if s <= #str then
-    table.insert(t, str:sub(s))
-  end
-
-  return t
-end
 
 local jwt = {}
 

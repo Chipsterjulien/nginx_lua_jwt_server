@@ -1,11 +1,11 @@
 local jwt = require( 'jwt' )
 local json = require( 'json' )
-local external = require( 'external' )
 local http = require( 'socket.http' )
+local errorResponse = require( 'external.errorResponse' )
+local ngx = ngx or require( 'ngx' )
 
 http.TIMEOUT = 5
 
-local ngx = ngx or require( 'ngx' )
 
 local function buildURL( location, action )
   return
@@ -20,16 +20,16 @@ end
 local function checkProblems( queryParameters, data )
   -- check if where parameters is empty, not existing
   if not queryParameters.where then
-    external.errorResponse( 404, 'No or not acceptable query parameters given' )
+    errorResponse( 404, 'No or not acceptable query parameters given' )
   end
 
   local where = queryParameters.where
   if where == "" then
-    external.errorResponse( 400, "'where' query parameter is empty" )
+    errorResponse( 400, "'where' query parameter is empty" )
   end
 
   if type( where ) ~= 'string' then
-    external.errorResponse(
+    errorResponse(
       400,
       "'where' query parameter is not a string (found a " .. type( where ) .. ')'
     )
@@ -37,7 +37,7 @@ local function checkProblems( queryParameters, data )
 
   -- Check if where exist in config file
   if not data[where] then
-    external.errorResponse( 400, '[' .. where .. ']' .. ' is not known in confilg file' )
+    errorResponse( 400, '[' .. where .. ']' .. ' is not known in confilg file' )
   end
 end
 
@@ -74,7 +74,7 @@ local function startStop( queryParameters, data, action )
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
   if err then
-    external.errorResponse( 500, err )
+    errorResponse( 500, err )
   end
 
   if action == 'startAlarm' then
@@ -97,7 +97,7 @@ local routes = {}
 
 function routes.getList( data )
   if not data.default.whereList then
-    external.errorResponse( 404, "'whereList' not found in config file" )
+    errorResponse( 404, "'whereList' not found in config file" )
   end
 
   local payload = {
@@ -120,7 +120,7 @@ function routes.getState( data )
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
   if err then
-    external.errorResponse( 500, err )
+    errorResponse( 500, err )
   end
 
   ngx.say( dataStr )
@@ -129,7 +129,7 @@ end
 function routes.refresh( data, myJWT )
   local newJWT, exp, err = jwt.refresh( myJWT, data.default.secretKey, data.default.exp )
   if err then
-    external.errorResponse( 400, err )
+    errorResponse( 400, err )
   end
 
   -- Build payload response
