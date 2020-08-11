@@ -8,10 +8,11 @@
 -- Examples:
 --  curl -d '{"username":"admin", "password":"admin"}' -H "Content-Type: application/json" -X POST localhost:8090/login
 --  curl localhost:8090/api/v1/getList -H "Content-Type: application/json" -H "Authorization: Bearer xxxxxxx"
---  http -v --json POST localhost:8000/login username=admin password=admin
---  http -v -f GET localhost:8090/api/v1/e "Authorization:Bearer xxxxxxxxx"  "Content-Type: application/json"
+--
+--  http -v --json POST localhost:8090/login username=admin password=admin
+--  http -v -f GET localhost:8090/api/v1/getList "Authorization:Bearer xxxxxxxxx"  "Content-Type: application/json"
 
-package.path = package.path .. ';/app/?.lua;/app/external/?.lua'
+package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party/?.lua'
 
 local jwt = require( 'jwt' )
 local toml = require( 'toml' )

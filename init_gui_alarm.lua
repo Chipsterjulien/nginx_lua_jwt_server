@@ -1,6 +1,6 @@
 #!/usr/bin/luajit
 
-package.path = package.path .. ';/app/?.lua;/app/external/?.lua'
+package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party/?.lua'
 
 local dbFile = '/app/db/dbFile.db'
 
