@@ -9,3 +9,4 @@ json.lua: https://github.com/rxi/json.lua
 sha2.lua: https://github.com/Egor-Skriptunoff/pure_lua_SHA
 toml.lua: https://github.com/jonstoler/lua-toml
 basexx.lua: https://github.com/aiq/basexx
+luaunit.lua: https://github.com/bluebird75/luaunit
