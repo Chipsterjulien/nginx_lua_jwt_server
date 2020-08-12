@@ -1,9 +1,9 @@
 local function isTableEmpty( data )
-  for _ in pairs( data ) do
-    return false
+  if next( data ) == nil then
+    return true
   end
 
-  return true
+  return false
 end
 
 return isTableEmpty
