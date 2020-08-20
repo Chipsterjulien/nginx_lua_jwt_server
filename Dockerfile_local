@@ -7,7 +7,7 @@ RUN apk update && \
     luarocks-5.1 install lua-resty-core
 
 # Créer l'utilisateur www
-RUN adduser -H -D -g 'www' -s /bin/false www
+RUN adduser -H -D -g 'www' -G tty -s /bin/false www
 
 # Se placer dans le répertoire /app
 WORKDIR /app

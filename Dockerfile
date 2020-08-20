@@ -10,7 +10,7 @@ RUN apk update && \
     rm /var/cache/apk/*
 
 # Créer l'utilisateur www
-RUN adduser -H -D -g 'www' -s /bin/false www
+RUN adduser -H -D -g 'www' -G tty -s /bin/false www
 
 # Se placer dans le répertoire /app
 WORKDIR /app
