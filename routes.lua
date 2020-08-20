@@ -79,7 +79,12 @@ local function startStop( queryParameters, data, action )
 
   if action == 'startAlarm' then
     local startFile = data.default.startFile
-    local fd = os.open(startFile, 'w')
+
+    if not startFile or startFile == '' then
+      errorResponse( 500, '"startFile" is empty/not exists in config file' )
+    end
+
+    local fd = os.open( startFile, 'w' )
     fd:close()
   elseif action == 'stopAlarm' then
     local startFile = data.default.startFile
