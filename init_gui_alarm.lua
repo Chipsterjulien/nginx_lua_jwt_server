@@ -3,7 +3,7 @@
 package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party/?.lua'
 
 local splitN = require( 'external.splitN' )
-local readEntireFile = require( 'readEntireFile' )
+local readEntireFile = require( 'external.readEntireFile' )
 local ngx = ngx or require( 'ngx' )
 
 local dbFile = '/app/db/dbFile.db'
