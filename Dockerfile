@@ -28,6 +28,8 @@ COPY ./nginx/conf.d/guiAlarm.conf /etc/nginx/conf.d/guiAlarm.conf
 
 # Ajout des programmes lua pour gérer l'authentification et le reste de l'API REST
 COPY *.lua /app/
+COPY external/ /app/external
+COPY third-party/ /app/third-party
 COPY *.db /app/db/
 COPY ./cfg/guiAlarm.toml /app/cfg/
 
