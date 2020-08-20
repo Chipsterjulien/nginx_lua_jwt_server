@@ -28,14 +28,13 @@ COPY ./nginx/conf.d/guiAlarm.conf /etc/nginx/conf.d/guiAlarm.conf
 
 # Ajout des programmes lua pour gérer l'authentification et le reste de l'API REST
 COPY *.lua /app/
+COPY *.db /app/db/
 COPY external/ /app/external
 COPY third-party/ /app/third-party
-COPY *.db /app/db/
-COPY ./cfg/guiAlarm.toml /app/cfg/
+COPY cfg/ /app/cfg
 
 # Mettre les bonnes permissions
 RUN mkdir /run/nginx && touch /run/nginx/nginx.pid && \
-    # mkdir -p /var/lib/nginx/tmp/client_body && \
     chown -R www: /app && chmod -R 744 /app && \
     chown -R www: /run/nginx && \
     chown -R www: /var/lib/nginx && \
