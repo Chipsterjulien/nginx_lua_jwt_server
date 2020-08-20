@@ -64,10 +64,14 @@ local function main()
   end
 
   getWebRoutes[ road ]( data, myJWT )
+
+  ngx.log( ngx.NOTICE, string.format( '\n\nAction elapsed time: %.2f ms\n\n', ( os.clock() - initTime ) * 1000 ) )
+
+  ngx.exit( 200 )
 end
 
 ------
 -- Start here
 -------------
-
+initTime = os.clock()
 main()

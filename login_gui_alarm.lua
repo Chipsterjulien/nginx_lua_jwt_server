@@ -1,7 +1,5 @@
 #!/usr/bin/luajit
 
--- https://blog.elao.com/fr/infra/acceder-api-cross-domain-depuis-javascript-avec-cors-reverse-proxy-nginx/
-
 package.path = package.path .. ';/app/?.lua;/app/external/?.lua;/app/third-party/?.lua'
 
 local confFile = '/app/cfg/guiAlarm.toml'
@@ -78,11 +76,14 @@ local function main()
   }
 
   ngx.say( json.encode( payload ) )
+
+  ngx.log( ngx.NOTICE, string.format( '\n\nLogin elapsed time: %.2f ms\n\n', ( os.clock() - initTime ) * 1000 ) )
+
   ngx.exit( 200 )
 end
 
 ------
 -- Start here
 -------------
-
+initTime = os.clock()
 main()

@@ -8,7 +8,6 @@ local ngx = ngx or require( 'ngx' )
 
 local dbFile = '/app/db/dbFile.db'
 
-
 local function main()
   local data = readEntireFile( dbFile )
   local dataSplitted = splitN( data, "\n" )
