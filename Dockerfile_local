@@ -3,7 +3,7 @@ LABEL maintainer="julien"
 
 # Installation des bon paquets
 RUN apk update && \
-    apk add --no-cache luarocks5.1 nginx nginx-mod-http-lua lua5.1-socket git make gcc musl-dev && \
+    apk add --no-cache luarocks5.1 nginx nginx-mod-http-lua lua5.1-socket git make gcc musl-dev vim nano && \
     luarocks-5.1 install lua-resty-core
 
 # Créer l'utilisateur www

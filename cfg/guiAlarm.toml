@@ -9,11 +9,11 @@ exp = 120
 sub = "my_domain.com"
 # Timeout to contact others API
 timeout = 5
-whereList = ["Salon"]
-# File to indicate alarm is on
+# File to indicate alarm is on even if reboot (don't put it in /tmp)
 startFile = ""
 
-[Salon]
+[[whereList]]
+name = "Salon"
 ip = "http://192.168.1.18"
 port = 8090
 api = "/api/v1"

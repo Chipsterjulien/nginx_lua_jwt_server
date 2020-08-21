@@ -7,13 +7,13 @@ local ngx = ngx or require( 'ngx' )
 http.TIMEOUT = 5
 
 
-local function buildURL( location, action )
+local function buildURL( locationObj, action )
   return
-    location.ip ..
-    ( location.port and ( ":" .. location.port ) or "") ..
-    ( location.api and (( location.api:sub( 1, 1 ) ~= "/" ) and "/" ) or "" ) ..
-    ( location.api or "" ) ..
-    ( location.api and (( location.api:sub( -1, -1 ) ~= "/" ) and "/" ) or "" ) ..
+    locationObj.ip ..
+    ( locationObj.port and ( ":" .. locationObj.port ) or "") ..
+    ( locationObj.api and (( locationObj.api:sub( 1, 1 ) ~= "/" ) and "/" ) or "" ) ..
+    ( locationObj.api or "" ) ..
+    ( locationObj.api and (( locationObj.api:sub( -1, -1 ) ~= "/" ) and "/" ) or "" ) ..
     action
 end
 
@@ -24,7 +24,7 @@ local function checkProblems( queryParameters, data )
   end
 
   local where = queryParameters.where
-  if where == "" then
+  if where == '' then
     errorResponse( 400, "'where' query parameter is empty" )
   end
 
@@ -35,8 +35,15 @@ local function checkProblems( queryParameters, data )
     )
   end
 
-  -- Check if where exist in config file
-  if not data[where] then
+  local found = false
+  for _, whereObj in pairs( data.whereList ) do
+    if whereObj.name == where then
+      found = true
+      break
+    end
+  end
+
+  if not found then
     errorResponse( 400, '[' .. where .. ']' .. ' is not known in confilg file' )
   end
 end
@@ -67,9 +74,16 @@ end
 local function startStop( queryParameters, data, action )
   checkProblems( queryParameters, data )
 
-  -- buildURL
   local where = queryParameters.where
-  local url = buildURL( data[ where ], action )
+
+  -- buildURL
+  local url = ''
+  for _, whereObj in pairs( data.whereList ) do
+    if whereObj.name == where then
+      url = buildURL( whereObj, action )
+      break
+    end
+  end
 
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
@@ -101,13 +115,18 @@ end
 local routes = {}
 
 function routes.getList( data )
-  if not data.default.whereList then
+  if not data.whereList then
     errorResponse( 404, "'whereList' not found in config file" )
+  end
+
+  local whereList = {}
+  for _, whereObj in pairs( data.whereList ) do
+    table.insert( whereList, whereObj.name )
   end
 
   local payload = {
     code = 200,
-    whereList = data.default.whereList
+    whereList = whereList
   }
 
   ngx.say( json.encode( payload ) )
@@ -118,9 +137,16 @@ function routes.getState( data )
 
   checkProblems( queryParameters, data)
 
-  -- buildURL
   local where = queryParameters.where
-  local url = buildURL( data[ where ], 'stateAlarm' )
+
+  -- buildURL
+  local url = ''
+  for _, whereObj in pairs( data.whereList ) do
+    if whereObj.name == where then
+      url = buildURL( whereObj, 'stateAlarm' )
+      break
+    end
+  end
 
   -- contact url
   local dataStr, err = getURL( url, data.default.timeout )
