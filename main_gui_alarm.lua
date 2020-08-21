@@ -56,7 +56,7 @@ local function main()
     errorResponse( 401, err )
   end
 
-  local routeInitial = data.default.routeInitial:gsub( "/$", '' )
+  local routeInitial = data.default.routeInitial:gsub( '/$', '' )
   local road = ngx.var.uri:gsub( routeInitial, '' )
 
   if not getWebRoutes[ road ] then
