@@ -31,7 +31,7 @@ local function main()
   ngx.req.read_body()
   -- Get data from request body
   local body = ngx.req.get_body_data()
-  if not body or body == "" then
+  if not body or body == '' then
     errorResponse( 400, 'No data found' )
   end
 

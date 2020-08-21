@@ -10,7 +10,7 @@ local dbFile = '/app/db/dbFile.db'
 
 local function main()
   local data = readEntireFile( dbFile )
-  local dataSplitted = splitN( data, "\n" )
+  local dataSplitted = splitN( data, '\n' )
 
   -- Load all login and password in shared memory
   for _, line in ipairs( dataSplitted ) do
