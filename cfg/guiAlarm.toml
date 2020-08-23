@@ -10,10 +10,16 @@ sub = "my_domain.com"
 # Timeout to contact others API
 timeout = 5
 # File to indicate alarm is on even if reboot (don't put it in /tmp)
-startFile = ""
+startFile = "/app/run/start"
 
 [[whereList]]
 name = "Salon"
 ip = "http://192.168.1.18"
+port = 8090
+api = "/api/v1"
+
+[[whereList]]
+name = "outdoor"
+ip = "http://192.168.1.19"
 port = 8090
 api = "/api/v1"
